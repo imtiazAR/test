@@ -46,7 +46,7 @@ EOF
     echo "systemd-hwdb updated."
     echo
 
-    $SUDO udevadm trigger -v "/sys/class/power_supply/$BATTERY" || true
+    $SUDO udevadm trigger -v "/sys/class/power_supply/$BATTERY"
     
     echo
     echo "udevadm triggered."
@@ -56,8 +56,8 @@ EOF
     echo "Battery charge limit configured: 50%-55%."
     echo
     echo "Start threshold:"
-    cat "/sys/class/power_supply/$BATTERY/charge_control_start_threshold" || true
+    cat "/sys/class/power_supply/$BATTERY/charge_control_start_threshold"
 
     echo "End threshold:"
-    cat "/sys/class/power_supply/$BATTERY/charge_control_end_threshold" || true
+    cat "/sys/class/power_supply/$BATTERY/charge_control_end_threshold"
 fi
