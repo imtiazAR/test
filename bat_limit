@@ -37,11 +37,20 @@ else
 # CHARGE_LIMIT=_,80 (charge_control_start_threshold will be skipped and charge_control_end_threshold is 80.)
 
 battery:*:*:dmi:*
- CHARGE_LIMIT=75,80
+ CHARGE_LIMIT=50,55
 EOF
 
     $SUDO systemd-hwdb update
-    $SUDO udevadm trigger -v -p "/sys/class/power_supply/$BATTERY"
+   
+    echo
+    echo "systemd-hwdb updated."
+    echo
+
+    $SUDO udevadm trigger -v "/sys/class/power_supply/$BATTERY" || true
+    
+    echo
+    echo "udevadm triggered."
+    echo
 
     echo
     echo "Battery charge limit configured: 50%-55%."
