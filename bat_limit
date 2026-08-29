@@ -1,7 +1,18 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if (( EUID != 0 )); then
+    SUDO="sudo"
+else
+    SUDO=""
+fi
+
 battery() {
     local START="${1:-}"
     local END="${2:-}"
     local BATTERY
+    local HWDB_FILE="/etc/udev/hwdb.d/61-battery-local.hwdb"
 
     if [[ -z "$START" || -z "$END" ]]; then
         echo "Usage: battery <start> <end>"
@@ -20,16 +31,14 @@ battery() {
     echo "Battery detected: $BATTERY"
     echo "Setting charge limit to ${START}%-${END}%..."
 
-HWDB_FILE="/etc/udev/hwdb.d/61-battery-local.hwdb"
-
-if $SUDO grep -q '^ CHARGE_LIMIT=' "$HWDB_FILE"; then
-    $SUDO sed -i \
-        "s/^ CHARGE_LIMIT=.*/ CHARGE_LIMIT=${START},${END}/" \
-        "$HWDB_FILE"
-else
-    echo "Error: CHARGE_LIMIT key not found in $HWDB_FILE"
-    return 1
-fi
+    if sudo grep -q '^ CHARGE_LIMIT=' "$HWDB_FILE"; then
+        sudo sed -i \
+            "s/^ CHARGE_LIMIT=.*/ CHARGE_LIMIT=${START},${END}/" \
+            "$HWDB_FILE"
+    else
+        echo "Error: CHARGE_LIMIT key not found in $HWDB_FILE"
+        return 1
+    fi
 
     if sudo systemd-hwdb update; then
         echo "systemd-hwdb updated."
