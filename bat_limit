@@ -3,9 +3,9 @@ battery() {
     local END="${2:-}"
     local BATTERY
     local HWDB_FILE="/etc/udev/hwdb.d/61-battery-local.hwdb"
-       $SUDO mkdir -p /etc/udev/hwdb.d
+       sudo mkdir -p /etc/udev/hwdb.d
 
-    $SUDO tee "$HWDB_FILE" >/dev/null <<'EOF'
+    sudo tee "$HWDB_FILE" >/dev/null <<'EOF'
 # To add local overrides, create a new file
 # /etc/udev/hwdb.d/61-battery-local.hwdb
 # and add your rules there. To load the new rules execute (as root):
