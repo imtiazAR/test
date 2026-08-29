@@ -2,7 +2,6 @@
 battery() {
     local START="${1:-}"
     local END="${2:-}"
-    local BATTERY
     local HWDB_FILE="/etc/udev/hwdb.d/61-battery-local.hwdb"
      
     if [[ -z "$START" || -z "$END" ]]; then
