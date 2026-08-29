@@ -32,7 +32,7 @@ battery() {
     if sudo systemd-hwdb update; then
         echo "systemd-hwdb updated."
 
-        if sudo udevadm trigger -v -p "/sys/class/power_supply/$BATTERY"; then
+        if sudo udevadm trigger -v "/sys/class/power_supply/$BATTERY"; then
             echo "udevadm triggered successfully."
         else
             echo "Warning: udevadm trigger failed."
