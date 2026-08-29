@@ -54,3 +54,9 @@ fi
         cat "/sys/class/power_supply/$BATTERY/charge_control_end_threshold"
     fi
 }
+
+echo
+echo
+cat /etc/udev/hwdb.d/61-battery-local.hwdb
+echo
+echo
