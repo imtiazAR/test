@@ -1,3 +1,11 @@
+  BATTERY=$(find /sys/class/power_supply -maxdepth 1 -type l \
+        -name 'BAT*' -printf '%f\n' | head -n1)
+
+    if [[ -z "$BATTERY" ]]; then
+        echo "No battery found."
+        return 1
+    fi
+
 battery() {
     local START="${1:-}"
     local END="${2:-}"
@@ -15,13 +23,7 @@ battery() {
         return 1
     fi
 
-    BATTERY=$(find /sys/class/power_supply -maxdepth 1 -type l \
-        -name 'BAT*' -printf '%f\n' | head -n1)
-
-    if [[ -z "$BATTERY" ]]; then
-        echo "No battery found."
-        return 1
-    fi
+  
 
     echo "Battery detected: $BATTERY"
     echo "Setting charge limit to ${START}%-${END}%..."
