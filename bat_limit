@@ -1,4 +1,3 @@
-```bash
 battery() {
     local START="${1:-}"
     local END="${2:-}"
@@ -58,4 +57,3 @@ fi
         cat "/sys/class/power_supply/$BATTERY/charge_control_end_threshold"
     fi
 }
-```
