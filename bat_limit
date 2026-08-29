@@ -1,10 +1,3 @@
-  BATTERY=$(find /sys/class/power_supply -maxdepth 1 -type l \
-        -name 'BAT*' -printf '%f\n' | head -n1)
-
-    if [[ -z "$BATTERY" ]]; then
-        echo "No battery found."
-        return 1
-    fi
 
 battery() {
     local START="${1:-}"
