@@ -10,11 +10,10 @@ battery() {
         return 1
     fi
 
-    if [[ ! "$START" =~ ^[0-9]+$ || ! "$END" =~ ^[0-9]+$ ]]; then
-        echo "Error: Start and end must be numbers."
-        return 1
-    fi
-
+  if [[ ! "$START" =~ ^([0-9]{1,2}|100|_)$ || ! "$END" =~ ^([0-9]{1,2}|100|_)$ ]]; then
+    echo "Error: Start and end must be 0-100 or _."
+    return 1
+fi
   
 
     echo "Battery detected: $BATTERY"
