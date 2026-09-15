@@ -155,13 +155,16 @@ echo "==> Installing theme..."
 "${SUDO[@]}" rm -rf \
     "${THEME_DIR:?}/${THEME}"
 
-# Copy verified theme
-"${SUDO[@]}" cp -a \
+# Install verified theme
+"${SUDO[@]}" mkdir -p "$THEME_DIR"
+
+"${SUDO[@]}" cp -aT \
     "$THEME_SOURCE" \
-    "$THEME_DIR/"
+    "${THEME_DIR}/${THEME}"
 
 # Final verification
-[[ -f "${THEME_DIR}/${THEME}/theme.txt" ]] || \
+"${SUDO[@]}" test -f \
+    "${THEME_DIR}/${THEME}/theme.txt" || \
     error "Theme installation failed."
 
 echo "    Installed to:"
