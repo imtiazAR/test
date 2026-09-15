@@ -210,7 +210,7 @@ fi
 # Find Fedora GRUB configuration path
 # ============================================================
 
-GRUB_CFG="$(readlink -f /etc/grub2.cfg)"
+GRUB_CFG="$("${SUDO[@]}" readlink -f /etc/grub2.cfg)"
 
 [[ -n "$GRUB_CFG" ]] || \
     error "Could not determine GRUB configuration path."
