@@ -221,24 +221,24 @@ GRUB_CFG="$(readlink -f /etc/grub2.cfg)"
 # Regenerate grub.cfg
 # ============================================================
 
-sudo test -f /boot/grub2/themes/Solara-left/theme.txt \
-    && echo "Theme files: OK" \
-    || echo "Theme files: MISSING"
-
 echo
 echo "==> Regenerating grub.cfg..."
 
 "${SUDO[@]}" grub2-mkconfig -o "$GRUB_CFG"
 
 # ============================================================
-# Final verification
+# Verify generated grub.cfg
 # ============================================================
 
 echo
-echo "==> Verifying generated GRUB configuration..."
+echo "==> Verifying generated grub.cfg..."
 
-if grep -q "Solara-left/theme.txt" "$GRUB_CFG"; then
+if "${SUDO[@]}" grep -Fq \
+    "Solara-left/theme.txt" \
+    "$GRUB_CFG"; then
+
     echo "    Theme detected in grub.cfg."
+
 else
     error "Theme was not detected in generated grub.cfg."
 fi
