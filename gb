@@ -156,8 +156,6 @@ echo "==> Installing theme..."
     "${THEME_DIR:?}/${THEME}"
 
 # Install verified theme
-"${SUDO[@]}" mkdir -p "$THEME_DIR"
-
 "${SUDO[@]}" cp -aT \
     "$THEME_SOURCE" \
     "${THEME_DIR}/${THEME}"
