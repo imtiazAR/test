@@ -221,6 +221,7 @@ GRUB_CFG="$("${SUDO[@]}" readlink -f /etc/grub2.cfg)"
 
 echo
 echo "==> Regenerating grub.cfg..."
+echo
 
 "${SUDO[@]}" grub2-mkconfig -o "$GRUB_CFG"
 
