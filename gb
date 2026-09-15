@@ -202,10 +202,11 @@ update_var GRUB_THEME "\"${THEME_DIR}/${THEME}/theme.txt\""
 
 echo "==> Verifying GRUB configuration..."
 
-grep -Eq \
-    "^GRUB_THEME=\"${THEME_DIR}/${THEME}/theme.txt\"$" \
-    "$GRUB_FILE" || \
+if grep -Fq "GRUB_THEME=\"${THEME_DIR}/${THEME}/theme.txt\"" "$GRUB_FILE"; then
+    echo "    GRUB_THEME configured correctly."
+else
     error "GRUB_THEME was not configured correctly."
+fi
 
 # ============================================================
 # Find Fedora GRUB configuration path
