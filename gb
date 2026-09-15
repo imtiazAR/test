@@ -1,0 +1,253 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# ============================================================
+# Solara-left GRUB Theme Installer
+# Fedora Linux
+# ============================================================
+
+THEME="Solara-left"
+BASE_URL="https://raw.githubusercontent.com/imtiazAR/fedora/main/grub-themes"
+URL="${BASE_URL}/${THEME}.zip"
+
+THEME_DIR="/boot/grub2/themes"
+GRUB_FILE="/etc/default/grub"
+
+TMP_DIR="$(mktemp -d)"
+
+# ============================================================
+# Cleanup
+# ============================================================
+
+cleanup() {
+    rm -rf "$TMP_DIR"
+}
+
+trap cleanup EXIT
+
+# ============================================================
+# Error handler
+# ============================================================
+
+error() {
+    echo
+    echo "Error: $*" >&2
+    exit 1
+}
+
+# ============================================================
+# Sudo handling
+# ============================================================
+
+if (( EUID == 0 )); then
+    SUDO=()
+else
+    SUDO=(sudo)
+fi
+
+# ============================================================
+# Header
+# ============================================================
+
+echo
+echo "========================================="
+echo " Solara-left GRUB Theme Installer"
+echo " Fedora Linux"
+echo "========================================="
+echo
+
+# ============================================================
+# Check requirements
+# ============================================================
+
+echo "==> Checking requirements..."
+
+command -v curl >/dev/null 2>&1 || \
+    error "curl is not installed."
+
+command -v unzip >/dev/null 2>&1 || \
+    error "unzip is not installed."
+
+command -v grub2-mkconfig >/dev/null 2>&1 || \
+    error "grub2-mkconfig is not installed."
+
+[[ -f "$GRUB_FILE" ]] || \
+    error "$GRUB_FILE not found."
+
+# ============================================================
+# Ask for sudo password once
+# ============================================================
+
+if (( EUID != 0 )); then
+    echo "==> Requesting administrator privileges..."
+    sudo -v
+fi
+
+# ============================================================
+# Download theme
+# ============================================================
+
+echo
+echo "==> Downloading ${THEME}..."
+
+curl -fL \
+    --retry 3 \
+    --retry-delay 2 \
+    "$URL" \
+    -o "$TMP_DIR/theme.zip"
+
+# ============================================================
+# Extract theme to temporary directory
+# ============================================================
+
+echo "==> Extracting theme..."
+
+mkdir -p "$TMP_DIR/extracted"
+
+unzip -oq \
+    "$TMP_DIR/theme.zip" \
+    -d "$TMP_DIR/extracted"
+
+# ============================================================
+# Verify theme structure
+# ============================================================
+
+THEME_SOURCE="$TMP_DIR/extracted/$THEME"
+
+[[ -d "$THEME_SOURCE" ]] || \
+    error "Theme directory '$THEME' was not found in the ZIP archive."
+
+[[ -f "$THEME_SOURCE/theme.txt" ]] || \
+    error "theme.txt was not found in the theme archive."
+
+[[ -f "$THEME_SOURCE/background.jpg" ]] || \
+    error "background.jpg was not found in the theme archive."
+
+[[ -d "$THEME_SOURCE/icons" ]] || \
+    error "icons directory was not found in the theme archive."
+
+echo "    Theme structure verified."
+
+# ============================================================
+# Backup GRUB configuration
+# ============================================================
+
+echo
+echo "==> Backing up GRUB configuration..."
+
+"${SUDO[@]}" cp -an \
+    "$GRUB_FILE" \
+    "${GRUB_FILE}.bak"
+
+echo "    Backup: ${GRUB_FILE}.bak"
+
+# ============================================================
+# Install theme
+# ============================================================
+
+echo
+echo "==> Installing theme..."
+
+"${SUDO[@]}" mkdir -p "$THEME_DIR"
+
+# Remove previous version
+"${SUDO[@]}" rm -rf \
+    "${THEME_DIR:?}/${THEME}"
+
+# Copy verified theme
+"${SUDO[@]}" cp -a \
+    "$THEME_SOURCE" \
+    "$THEME_DIR/"
+
+# Final verification
+[[ -f "${THEME_DIR}/${THEME}/theme.txt" ]] || \
+    error "Theme installation failed."
+
+echo "    Installed to:"
+echo "    ${THEME_DIR}/${THEME}"
+
+# ============================================================
+# Update /etc/default/grub
+# ============================================================
+
+update_var() {
+    local key="$1"
+    local value="$2"
+
+    if grep -Eq "^[[:space:]]*${key}=" "$GRUB_FILE"; then
+        "${SUDO[@]}" sed -Ei \
+            "s|^[[:space:]]*${key}=.*|${key}=${value}|" \
+            "$GRUB_FILE"
+    else
+        printf '%s\n' "${key}=${value}" | \
+            "${SUDO[@]}" tee -a "$GRUB_FILE" >/dev/null
+    fi
+}
+
+echo
+echo "==> Configuring GRUB..."
+
+update_var GRUB_TERMINAL_OUTPUT '"gfxterm"'
+update_var GRUB_GFXMODE '"auto"'
+update_var GRUB_GFXPAYLOAD_LINUX '"keep"'
+update_var GRUB_THEME "\"${THEME_DIR}/${THEME}/theme.txt\""
+
+# ============================================================
+# Verify GRUB configuration
+# ============================================================
+
+echo "==> Verifying GRUB configuration..."
+
+grep -Eq \
+    "^GRUB_THEME=\"${THEME_DIR}/${THEME}/theme.txt\"$" \
+    "$GRUB_FILE" || \
+    error "GRUB_THEME was not configured correctly."
+
+# ============================================================
+# Find Fedora GRUB configuration path
+# ============================================================
+
+GRUB_CFG="$(readlink -f /etc/grub2.cfg)"
+
+[[ -n "$GRUB_CFG" ]] || \
+    error "Could not determine GRUB configuration path."
+
+# ============================================================
+# Regenerate grub.cfg
+# ============================================================
+
+echo
+echo "==> Regenerating grub.cfg..."
+
+"${SUDO[@]}" grub2-mkconfig -o "$GRUB_CFG"
+
+# ============================================================
+# Final verification
+# ============================================================
+
+echo
+echo "==> Verifying generated GRUB configuration..."
+
+if grep -q "Solara-left/theme.txt" "$GRUB_CFG"; then
+    echo "    Theme detected in grub.cfg."
+else
+    error "Theme was not detected in generated grub.cfg."
+fi
+
+# ============================================================
+# Done
+# ============================================================
+
+echo
+echo "========================================="
+echo " Theme installed successfully!"
+echo "========================================="
+echo
+echo " Theme : ${THEME}"
+echo " Path  : ${THEME_DIR}/${THEME}"
+echo " GRUB  : ${GRUB_CFG}"
+echo " Backup: ${GRUB_FILE}.bak"
+echo
+echo "Reboot your computer to see the new GRUB theme."
+echo
