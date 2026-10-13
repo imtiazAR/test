@@ -12,9 +12,6 @@ echo "=========================================="
 # Appearance
 gsettings set org.gnome.desktop.interface color-scheme "'prefer-dark'"
 gsettings set org.gnome.desktop.interface accent-color "'green'"
-gsettings set org.gnome.desktop.interface gtk-theme "'Adwaita'"
-gsettings set org.gnome.desktop.interface icon-theme "'Adwaita'"
-gsettings set org.gnome.desktop.interface cursor-theme "'Adwaita'"
 gsettings set org.gnome.desktop.interface cursor-size 24
 gsettings set org.gnome.desktop.interface enable-animations true
 gsettings set org.gnome.desktop.interface overlay-scrolling true
@@ -30,10 +27,6 @@ gsettings set org.gnome.desktop.interface show-battery-percentage true
 gsettings set org.gnome.desktop.input-sources sources \
     "[('xkb', 'us'), ('ibus', 'm17n:bn:khipro')]"
 
-gsettings set org.gnome.desktop.input-sources mru-sources \
-    "[('xkb', 'us'), ('ibus', 'm17n:bn:khipro')]"
-
-gsettings set org.gnome.desktop.input-sources current 0
 
 # Input Source Shortcuts
 gsettings set org.gnome.desktop.wm.keybindings switch-input-source \
