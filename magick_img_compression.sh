@@ -4,6 +4,10 @@ for f in ./*.{jpg,JPG,jpeg,JPEG}; do
     [ -e "$f" ] || continue
 
     filename=$(basename "${f%.*}")
+#some size for resize
+#3mp -resize '2048x2048>'
+#4mp -resize '2304x2304>'
+#5mp -resize '2560x2560>'
 
     magick "$f" \
       -resize '2048x2048>' \
