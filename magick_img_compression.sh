@@ -1,4 +1,5 @@
-mkdir -p compressed
+DIR="comp"
+mkdir -p $DIR
 
 for f in ./*.{jpg,JPG,jpeg,JPEG}; do
     [ -e "$f" ] || continue
@@ -14,7 +15,7 @@ for f in ./*.{jpg,JPG,jpeg,JPEG}; do
       -sampling-factor 4:2:0 \
       -interlace Plane \
       -quality 50 \
-      "./compressed/${filename}.jpg"
+      "./$DIR/${filename}.jpg"
 done
 
 for f in ./*.{png,PNG}; do
@@ -25,5 +26,5 @@ for f in ./*.{png,PNG}; do
     magick "$f" \
       -resize '2048x2048>' \
       -define png:compression-level=9 \
-      "./compressed/${filename}.png"
+      "./$DIR/${filename}.png"
 done
